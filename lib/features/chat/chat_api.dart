@@ -44,6 +44,7 @@ class ChatApi {
     throw Exception('Unexpected response: expected List');
   }
 
+  // 실시간 채팅에서는 WS send를 사용 권장(중복 저장/갱신 꼬임 방지)
   Future<ChatMessageOut> sendMessage(int roomId, String content) async {
     final res = await _client.dio.post(
       '${ApiEndpoints.chatRooms}/$roomId/messages',

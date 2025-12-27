@@ -26,20 +26,29 @@ class ChatMessageOut {
   final int chatRoomId;
   final int senderId;
   final String content;
+  final DateTime? createdAt;
 
   ChatMessageOut({
     required this.id,
     required this.chatRoomId,
     required this.senderId,
     required this.content,
+    this.createdAt,
   });
 
   factory ChatMessageOut.fromJson(Map<String, dynamic> j) {
+    DateTime? createdAt;
+    final raw = j['created_at'];
+    if (raw is String) {
+      createdAt = DateTime.tryParse(raw);
+    }
+
     return ChatMessageOut(
       id: (j['id'] as num).toInt(),
       chatRoomId: (j['chat_room_id'] as num).toInt(),
       senderId: (j['sender_id'] as num).toInt(),
       content: (j['content'] as String?) ?? '',
+      createdAt: createdAt,
     );
   }
 }
