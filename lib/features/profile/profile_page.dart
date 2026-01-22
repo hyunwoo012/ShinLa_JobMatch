@@ -6,6 +6,8 @@ import '../../main.dart';
 import '../auth/auth_model.dart';
 import 'user_profile_page.dart';
 import 'profile_model.dart';
+import 'applicant_page.dart';
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -355,10 +357,27 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ] else ...[
             const Text(
-              'No editable profile fields for COMPANY on the current server.',
+              'Company Menu',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 10),
+            PrimaryButton(
+              text: 'View Applicants (Demo)',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ApplicantsPage()),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Applicants list is demo based on cached student profiles.\n'
+                  'After backend is ready, this will show real applicants.',
               style: TextStyle(fontSize: 12),
             ),
           ],
+
         ],
       ),
     );

@@ -11,13 +11,28 @@ class ProfileController extends ChangeNotifier {
   StudentProfile? _myStudentProfile;
   StudentProfile? get myStudentProfile => _myStudentProfile;
 
-  /// 기존: 서버에서 프로필 로드
+  // ✅ 앱-only: "지원자(학생) 프로필" 캐시 (회사 화면에서 조회용)
+  final Map<int, StudentProfile> _studentCache = {};
+  List<StudentProfile> get cachedStudentProfiles =>
+      _studentCache.values.toList()..sort((a, b) => a.userId.compareTo(b.userId));
+
+  void _cacheStudent(StudentProfile p) {
+    _studentCache[p.userId] = p;
+  }
+
+  StudentProfile? getCachedStudentProfile(int userId) => _studentCache[userId];
+
+  /// 기존: 서버에서 내 학생 프로필 로드
   Future<void> loadMyStudentProfile() async {
     _myStudentProfile = await _api.getMyStudentProfile();
+
+    // ✅ 로드된 내 프로필은 캐시에 저장 (회사 화면 데모용)
+    if (_myStudentProfile != null) _cacheStudent(_myStudentProfile!);
+
     notifyListeners();
   }
 
-  /// 기존: 서버에 프로필 저장(기본 필드)
+  /// 기존: 서버에 내 학생 프로필 저장(기본 필드)
   /// - 링크/문서 업로드는 서버 준비 후 확장 예정
   Future<StudentProfile> saveMyStudentProfile({
     required String name,
@@ -45,6 +60,9 @@ class ProfileController extends ChangeNotifier {
       documents: prev?.documents,
     );
 
+    // ✅ 저장 후 캐시에도 업데이트
+    if (_myStudentProfile != null) _cacheStudent(_myStudentProfile!);
+
     notifyListeners();
     return _myStudentProfile!;
   }
@@ -65,6 +83,10 @@ class ProfileController extends ChangeNotifier {
       linkedinUrl: linkedinUrl,
       notionUrl: notionUrl,
     );
+
+    // ✅ 캐시에도 반영
+    _cacheStudent(_myStudentProfile!);
+
     notifyListeners();
   }
 
@@ -105,6 +127,10 @@ class ProfileController extends ChangeNotifier {
     }
 
     _myStudentProfile = p.copyWith(documents: docs);
+
+    // ✅ 캐시에도 반영
+    _cacheStudent(_myStudentProfile!);
+
     notifyListeners();
   }
 
